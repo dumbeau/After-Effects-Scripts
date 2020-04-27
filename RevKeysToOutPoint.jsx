@@ -1,5 +1,4 @@
-﻿//Add reversed initial keyframes to out point on selected properties
-
+//Add expression to selected properties
 (function() {  
     var differentSlidersForProperties = true;  
     var composition = app.project.activeItem;  
@@ -21,7 +20,10 @@
     }
     function addExpression(property) {  
         if (!property.canSetExpression) return;
-            var expression = 'key1 = key(1).time-inPoint; key2 = key(numKeys).time-inPoint; keyD = key2 - key1; if(time >= (outPoint - keyD)){ valueAtTime((inPoint+keyD)-(time-(outPoint-keyD))); }else{ value;}';  
+        
+ 
+            //Replace this variable's string value with your favorite expression
+            var expression = 'key1 = key(1).time-inPoint;\nkey2 = key(numKeys).time-inPoint;\nkeyD = key2 - key1;\nif(time >= (outPoint - keyD)){\nvalueAtTime((inPoint+keyD)-(time-(outPoint-keyD)));\n}else{value;}';  
             property.expression = expression;
     }
 })();
