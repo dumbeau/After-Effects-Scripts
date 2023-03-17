@@ -23,7 +23,7 @@
         
  
             //Replace this variable's string value with your favorite expression
-            var expression = 'key1 = key(1).time-inPoint;\nkey2 = key(numKeys).time-inPoint;\nkeyD = key2 - key1;\nif(time >= (outPoint - keyD)){\nvalueAtTime((inPoint+keyD)-(time-(outPoint-keyD)));\n}else{value;}';  
+            var expression = '\/\/Reverse Keyframes at out point\nkey1 = key(1).time-inPoint;\nkey2 = key(numKeys).time-inPoint;\nkeyD = key2 - key1;\nif(time >= (outPoint - keyD)){\nvalueAtTime((inPoint+keyD)-(time-(outPoint-keyD)));\n}else{value;}';  
             property.expression = expression;
     }
 })();
