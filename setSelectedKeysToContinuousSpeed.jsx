@@ -93,6 +93,13 @@ function setSelectedKeysToTemporalContinuousSpeed(easingValueInPreference, easin
         prop.setTemporalEaseAtKey(keyIndex, applyEaseInArray, applyEaseOutArray);
         prop.setInterpolationTypeAtKey(keyIndex, setEaseInType, setEaseOutType);
     }
+    function setPropertyKeyframeIndexToLinear(property, keyIndex, setKeyIn, setKeyOut) {    
+        if (property.canVaryOverTime && property.propertyValueType !== PropertyValueType.NO_VALUE) {
+            var inType = setKeyIn && property.keyInInterpolationType(keyIndex) !== KeyframeInterpolationType.LINEAR ? KeyframeInterpolationType.LINEAR : property.keyInInterpolationType(keyIndex);
+            var outType = setKeyOut && property.keyOutInterpolationType(keyIndex) !== KeyframeInterpolationType.LINEAR ? KeyframeInterpolationType.LINEAR : property.keyOutInterpolationType(keyIndex);
+            property.setInterpolationTypeAtKey(keyIndex, inType, outType);
+        }    
+    }
 
     var comp = app.project.activeItem;
     if (comp && comp instanceof CompItem) {
@@ -112,7 +119,7 @@ function setSelectedKeysToTemporalContinuousSpeed(easingValueInPreference, easin
 
 						//Check if keyframe is the first or last keyframe
 						if (selectedKeys[k] == 1 || selectedKeys[k] == property.numKeys) {
-							setPropertyKeyframeIndexToLinear(property, selectedKeys[k], true, true);	
+							setPropertyKeyframeIndexToLinear(property, selectedKeys[k], true, true)	
 							continue;
 						}
 
