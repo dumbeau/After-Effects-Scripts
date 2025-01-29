@@ -1,105 +1,29 @@
-//Change numbers (1-100) to your easing value preferences
-setSelectedKeysToTemporalContinuousSpeed(65,65);
+(function() {
 
-function setSelectedKeysToTemporalContinuousSpeed(easingValueInPreference, easingValueOutPreference) {
-    app.beginUndoGroup("Set Selected Keyframes to Continuous Speed");	
-	var easingValueIn = easingValueInPreference; // Set between 0 and 100
-	var easingValueOut = easingValueOutPreference; // Set between 0 and 100
+// Enter a number from -100 to 100 to set the ease value.
+// 0 will set the keyframe to use existing easing values, but will sync the incoming and outgoing speed.
+easeSelectedKeyframesWithTemporalContinuousSpeed(0);
 
-    function calculateDistance(a, b) {
-		// Ensure the inputs are arrays
-		a = [].concat(a);
-		b = [].concat(b);
+function easeSelectedKeyframesWithTemporalContinuousSpeed(easeValue){
+    easeSelectedKeyframesWithTemporalContinuousSpeed(75, true);    
+}
+
+function easeSelectedKeyframesWithTemporalContinuousSpeed(easeValue, setToIncomingSpeed){
+    app.beginUndoGroup("Set Selected Keyframes to Continuous Speed");
+
 	
-		// Ensure the arrays have the same length
-		if (a.length !== b.length) {
-			throw new Error('Inputs must be two numbers or two arrays of equal length.');
-		}
-	
-		// Calculate the Euclidean distance
-		var sum = 0;
-		for (var i = 0; i < a.length; i++) {
-			sum += Math.pow(a[i] - b[i], 2);
-		}
-		return Math.sqrt(sum);
+	var easingValueIn 
+	var easingValueOut
+
+	if (setToIncomingSpeed){
+		easingValueIn = easeValue;
+		easingValueOut = -1;		
+	} else {		
+		easingValueIn = -1;
+		easingValueOut = easeValue;
 	}
-    function setPropertyKeyIndexEasing(prop, keyIndex, easeInInfluence, easeOutInfluence){
-    
 
-        var changeEaseIn = true;
-        var setEaseInType = KeyframeInterpolationType.BEZIER;
-        if (easeInInfluence < 0){
-            changeEaseIn = false;
-            easeInInfluence = 0.1;
-        };
-        if(easeInInfluence < 0.1 && easeInInfluence >= 0){
-            setEaseInType = KeyframeInterpolationType.LINEAR;    
-            easeInInfluence = 0.1;
-        }    
-        var changeEaseOut = true;    
-        var setEaseOutType = KeyframeInterpolationType.BEZIER;
-        if (easeOutInfluence < 0){
-            changeEaseOut = false;
-            easeOutInfluence = 0.1;
-        };
-        if(easeOutInfluence < 0.1 && easeOutInfluence >= 0){        
-            setEaseOutType = KeyframeInterpolationType.LINEAR;        
-            easeOutInfluence = 0.1;
-        }
-        
-        var applyEaseIn = new KeyframeEase(0,easeInInfluence);
-        var applyEaseOut = new KeyframeEase(0,easeOutInfluence);
-    
-        if(!changeEaseIn){
-            applyEaseIn = prop.keyInTemporalEase(keyIndex)[0];             
-            setEaseInType = prop.keyInInterpolationType(keyIndex);          
-        }
-        if(!changeEaseOut){
-            applyEaseOut = prop.keyInTemporalEase(keyIndex)[0];
-            setEaseOutType = prop.keyOutInterpolationType(keyIndex);
-        }
-        
-        function fillArray(length, value){
-            var returnArray = [];
-            for(var i=0; i < length; i++){
-                returnArray.push(value);
-                }
-                return returnArray
-            }
-    
-    
-        function getPropertyValueLength(checkProp){
-            var dimensionArray = [6416,6414];
-            var checkTest = checkIndexPosition(dimensionArray,prop.propertyValueType)                
-            if (checkTest == -1){
-                return 1
-            } else {
-                return checkTest+2
-            }
-        }
-    
-        function checkIndexPosition(arr, value) {
-            for (var i = 0; i < arr.length; i++) {
-                if (arr[i] === value) {
-                return i;
-                }
-            }
-            return -1;
-            }
-        
-        var propValueLength = getPropertyValueLength(prop);
-        var applyEaseInArray = fillArray(propValueLength, applyEaseIn);
-        var applyEaseOutArray = fillArray(propValueLength, applyEaseOut);
-        prop.setTemporalEaseAtKey(keyIndex, applyEaseInArray, applyEaseOutArray);
-        prop.setInterpolationTypeAtKey(keyIndex, setEaseInType, setEaseOutType);
-    }
-    function setPropertyKeyframeIndexToLinear(property, keyIndex, setKeyIn, setKeyOut) {    
-        if (property.canVaryOverTime && property.propertyValueType !== PropertyValueType.NO_VALUE) {
-            var inType = setKeyIn && property.keyInInterpolationType(keyIndex) !== KeyframeInterpolationType.LINEAR ? KeyframeInterpolationType.LINEAR : property.keyInInterpolationType(keyIndex);
-            var outType = setKeyOut && property.keyOutInterpolationType(keyIndex) !== KeyframeInterpolationType.LINEAR ? KeyframeInterpolationType.LINEAR : property.keyOutInterpolationType(keyIndex);
-            property.setInterpolationTypeAtKey(keyIndex, inType, outType);
-        }    
-    }
+	
 
     var comp = app.project.activeItem;
     if (comp && comp instanceof CompItem) {
@@ -119,7 +43,7 @@ function setSelectedKeysToTemporalContinuousSpeed(easingValueInPreference, easin
 
 						//Check if keyframe is the first or last keyframe
 						if (selectedKeys[k] == 1 || selectedKeys[k] == property.numKeys) {
-							setPropertyKeyframeIndexToLinear(property, selectedKeys[k], true, true)	
+							setPropertyKeyframeIndexToLinear(property, selectedKeys[k], true, true);	
 							continue;
 						}
 
@@ -147,13 +71,17 @@ function setSelectedKeysToTemporalContinuousSpeed(easingValueInPreference, easin
 						var keyEaseOut						
 						// alert("Before: " + rateOfChangeBefore + "\nAfter: " + rateOfChangeAfter)
 						var setSpeed    
-						if (isLinear){setPropertyKeyIndexEasing(property,selectedKeys[k],easingValueIn,easingValueOut);}                 
-                        if (Math.abs(rateOfChangeBefore) > Math.abs(rateOfChangeAfter)) {							
+						setPropertyKeyIndexEasing(property,selectedKeys[k],easingValueIn,easingValueOut);
+						setPropertyKeyIndexEasing(property,selectedKeys[k],easingValueIn,easingValueOut);   
+
+                        if (setToIncomingSpeed) {
+							//Set to outgoing speed				
 							setPropertyKeyframeIndexToLinear(property, selectedKeys[k], false, true);	
 							keyEaseIn = property.keyInTemporalEase(selectedKeys[k]);
 							keyEaseOut = property.keyOutTemporalEase(selectedKeys[k]);
 							setSpeed = keyEaseOut[0].speed;
                         } else {
+							//Set to incoming speed				
 							setPropertyKeyframeIndexToLinear(property, selectedKeys[k], true, false);	
 							keyEaseIn = property.keyInTemporalEase(selectedKeys[k]);
 							keyEaseOut = property.keyOutTemporalEase(selectedKeys[k]);
@@ -165,8 +93,13 @@ function setSelectedKeysToTemporalContinuousSpeed(easingValueInPreference, easin
 							keyEaseOut[l].speed = setSpeed;
 						}
 						property.setTemporalEaseAtKey(selectedKeys[k], keyEaseIn, keyEaseOut);
-						if(rateOfChangeBefore == 0){setPropertyKeyframeIndexToLinear(property, selectedKeys[k], true, false);}
-						if(rateOfChangeAfter == 0){setPropertyKeyframeIndexToLinear(property, selectedKeys[k], false, true);}
+						property.setLabelAtKey(selectedKeys[k], 11);
+
+
+						setPropertyKeyframeIndexToLinear(property, selectedKeys[k], !setToIncomingSpeed, setToIncomingSpeed);
+
+						// if(rateOfChangeBefore == 0){setPropertyKeyframeIndexToLinear(property, selectedKeys[k], true, false);}
+						// if(rateOfChangeAfter == 0){setPropertyKeyframeIndexToLinear(property, selectedKeys[k], false, true);}
                     }
                 }
             }
@@ -174,3 +107,11 @@ function setSelectedKeysToTemporalContinuousSpeed(easingValueInPreference, easin
     }
     app.endUndoGroup();    
 }
+function setPropertyKeyframeIndexToLinear(property, keyIndex, setKeyIn, setKeyOut) {    
+    if (property.canVaryOverTime && property.propertyValueType !== PropertyValueType.NO_VALUE) {
+        var inType = setKeyIn && property.keyInInterpolationType(keyIndex) !== KeyframeInterpolationType.LINEAR ? KeyframeInterpolationType.LINEAR : property.keyInInterpolationType(keyIndex);
+        var outType = setKeyOut && property.keyOutInterpolationType(keyIndex) !== KeyframeInterpolationType.LINEAR ? KeyframeInterpolationType.LINEAR : property.keyOutInterpolationType(keyIndex);
+        property.setInterpolationTypeAtKey(keyIndex, inType, outType);
+    }    
+}
+})();
