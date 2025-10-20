@@ -43,6 +43,8 @@
 	
 	
 			var itemsNotFound = [];
+			var itemsNotFoundNames = [];
+
 			var anyItemsWithDifferentFrameRate = false;
 			var anyItemsWithDifferentAspectRatio = false; // Not implemented yet!!!
 	
@@ -59,14 +61,18 @@
 						break;
 					}
 					if (j == files.length - 1){
-						itemsNotFound.push(selectedAsset.name);
+						itemsNotFound.push(selectedAsset);
+						itemsNotFoundNames.push(selectedAsset.name);
 					}
 				}
 			}
 			if (itemsNotFound.length > 0){
-				alert("The following Getty assets were not found:\n\n" + itemsNotFound.join("\n") + "\n\nThese items will remain selected.");
+				alert("The following Getty assets were not found:\n\n" + itemsNotFoundNames.join("\n") + "\n\nThese items will remain selected.");
+				selectedItems = app.project.selection;
 				for (var i = 0; i < selectedItems.length; i++){
-					if( itemsNotFound.indexOf(selectedItems[i].name) == -1){
+					if (itemsNotFound.indexOf(selectedItems[i]) > -1){
+						selectedItems[i].selected = true;
+					} else {
 						selectedItems[i].selected = false;
 					}
 				}
@@ -95,8 +101,10 @@
 				//Check that footageItem is used in the project
 				var compsContainingItem = footageItem.usedIn
 				if (compsContainingItem.length == 0){
-					confirm(footageItem.name + " is not used in any compositions.\n\n Remove from project?", true);
-					footageItem.remove();				
+					var removeFromProject = confirm(footageItem.name + " is not used in any compositions.\n\n Remove from project?", true);
+					if (removeFromProject){
+						footageItem.remove();	
+					}	
 					return true;
 				}
 	
@@ -117,7 +125,8 @@
 				var originalFrameRate = footageItem.frameRate;
 				var originalAspectRatio = footageItem.width / footageItem.height;
 				
-				footageItem.replace(newAssetFile);	
+				footageItem.replace(newAssetFile);
+				footageItem.name = newAssetFile.name;	
 				var newFrameRate = footageItem.frameRate;
 				var newAspectRatio = footageItem.width / footageItem.height;
 	

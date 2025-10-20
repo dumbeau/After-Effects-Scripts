@@ -4,9 +4,6 @@
 // 0 will set the keyframe to use existing easing values, but will sync the incoming and outgoing speed.
 easeSelectedKeyframesWithTemporalContinuousSpeed(0);
 
-function easeSelectedKeyframesWithTemporalContinuousSpeed(easeValue){
-    easeSelectedKeyframesWithTemporalContinuousSpeed(75, true);    
-}
 
 function easeSelectedKeyframesWithTemporalContinuousSpeed(easeValue, setToIncomingSpeed){
     app.beginUndoGroup("Set Selected Keyframes to Continuous Speed");
@@ -33,7 +30,7 @@ function easeSelectedKeyframesWithTemporalContinuousSpeed(easeValue, setToIncomi
             var properties = layer.selectedProperties;
             for (var j = 0; j < properties.length; j++) {
                 var property = properties[j];                
-                if (property.propertyValueType == PropertyValueType.TwoD_SPATIAL || property.propertyValueType == PropertyValueType.ThreeD_SPATIAL || property.propertyValueType == 6414 || property.propertyValueType == 6417) {                
+				if ([PropertyValueType.TwoD_SPATIAL, PropertyValueType.ThreeD_SPATIAL, 6414, 6417].indexOf(property.propertyValueType)) {
                     var selectedKeys = property.selectedKeys;
                     for (var k = 0; k < selectedKeys.length; k++) {   
                         
@@ -114,4 +111,23 @@ function setPropertyKeyframeIndexToLinear(property, keyIndex, setKeyIn, setKeyOu
         property.setInterpolationTypeAtKey(keyIndex, inType, outType);
     }    
 }
+
+function calculateDistance(a, b) {
+    // Ensure the inputs are arrays
+    a = [].concat(a);
+    b = [].concat(b);
+
+    // Ensure the arrays have the same length
+    if (a.length !== b.length) {
+        throw new Error('Inputs must be two numbers or two arrays of equal length.');
+    }
+
+    // Calculate the Euclidean distance
+    var sum = 0;
+    for (var i = 0; i < a.length; i++) {
+        sum += Math.pow(a[i] - b[i], 2);
+    }
+    return Math.sqrt(sum);
+}
+
 })();
